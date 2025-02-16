@@ -64,6 +64,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Uses the automatically generated GITHUB_TOKEN
           fetch-depth: 0  # Ensure full history for merging
       - name: Configure Git
         run: |

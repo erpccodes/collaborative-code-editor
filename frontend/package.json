@@ -11,12 +11,21 @@
     "test": "echo \"No tests defined\" && exit 0"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.1.1",
+    "axios": "^1.8.1",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "frontend": "file:",
+    "jwt-decode": "^4.0.0",
+    "process": "^0.11.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.5"
+    "react-router-dom": "^7.1.5",
+    "sockjs-client": "^1.6.1"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@eslint/js": "^9.19.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
@@ -26,6 +35,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
-    "vite": "^6.1.0"
+    "vite": "^6.1.0",
+    "vite-plugin-node-polyfills": "^0.24.0"
   }
 }

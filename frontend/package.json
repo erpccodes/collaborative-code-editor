@@ -11,6 +11,7 @@
     "test": "echo \"No tests defined\" && exit 0"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "@stomp/stompjs": "^7.1.1",
     "axios": "^1.8.1",
     "buffer": "^6.0.3",
@@ -21,6 +22,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5",
+    "react-syntax-highlighter": "^16.1.0",
     "sockjs-client": "^1.6.1"
   },
   "devDependencies": {

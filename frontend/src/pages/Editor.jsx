@@ -7,8 +7,10 @@ import {
   getCurrentRoom,
 } from "../services/websocket";
 import { jwtDecode } from "jwt-decode";
+import Editor from "@monaco-editor/react";
+import axios from "axios";
 
-const Editor = () => {
+const CollaborativeEditor = () => {
   const [code, setCode] = useState("");
   const [username, setUsername] = useState("anonymous");
   const [inviteUser, setInviteUser] = useState("");
@@ -16,6 +18,9 @@ const Editor = () => {
   const [pendingInvite, setPendingInvite] = useState(null);
   const [collaborator, setCollaborator] = useState(null);
   const token = localStorage.getItem("token");
+  const [language, setLanguage] = useState("java");
+  const [output, setOutput] = useState("");
+  const [outputError, setOutputError] = useState("");
 
   // Decode username from JWT
   useEffect(() => {
@@ -101,6 +106,30 @@ const Editor = () => {
     alert(`📨 Invitation sent to ${inviteUser}! Waiting for them to accept...`);
     setInviteUser("");
   };
+
+  // handle code run button
+  const handleRunCode = async () => {
+  try {
+    const response = await axios.post("http://localhost:8585/api/execute/java", {
+      code
+    });
+
+    const { output: out, error } = response.data;
+
+    if (error) {
+      setOutputError(error);
+      setOutput("");
+    } else {
+      setOutput(out);
+      setOutputError("");
+    }
+  } catch (err) {
+    console.error("Error executing code:", err);
+    setOutputError("Execution failed: " + err.message);
+    setOutput("");
+  }
+};
+
 
   // Accept an invite and join the shared room
   const handleAcceptInvite = (invite) => {
@@ -502,29 +531,96 @@ const Editor = () => {
               </span>
             )}
           </div>
-          <textarea
-            style={{
-              width: "100%",
-              height: "calc(100% - 70px)",
-              borderRadius: "8px",
-              padding: "20px",
-              fontFamily: "'Fira Code', 'Consolas', 'Monaco', monospace",
-              fontSize: "15px",
-              lineHeight: "1.6",
-              border: "2px solid #333",
-              resize: "none",
-              backgroundColor: "#1e1e1e",
-              color: "#d4d4d4",
-              boxSizing: "border-box",
-              outline: "none",
-              transition: "border-color 0.3s ease"
-            }}
-            value={code}
-            onChange={handleChange}
-            placeholder={`// Welcome ${username}!\n// ${collaborator ? `You're editing with ${collaborator}` : 'Start typing or invite someone to collaborate...'}\n\nfunction hello() {\n  console.log("Happy coding!");\n}`}
-            onFocus={(e) => e.target.style.borderColor = "#667eea"}
-            onBlur={(e) => e.target.style.borderColor = "#333"}
-          />
+             <select
+        onChange={(e) => setLanguage(e.target.value)}
+        value={language}
+        style={{
+          marginBottom: "10px",
+          padding: "8px",
+          borderRadius: "6px",
+          fontSize: "14px",
+        }}
+      >
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
+        <option value="python">Python</option>
+        <option value="cpp">C++</option>
+        <option value="c">C</option>
+      </select>
+
+      
+  <button
+  onClick={handleRunCode}
+  className="btn-primary"
+  style={{
+    marginTop: "10px",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    color: "white",
+    border: "none",
+    cursor: "pointer"
+  }}
+>
+  ▶️ Run Code
+</button>
+
+      <Editor
+        height="calc(100vh - 150px)"
+        width="100%"
+        language={language}
+        theme="vs-dark"
+        value={code}
+        onChange={(newCode) => handleChange({ target: { value: newCode } })}
+        onMount={(editor) => {
+          editor.onDidFocusEditorText(() => {
+            editor.updateOptions({ renderLineHighlight: "all" });
+          });
+          editor.onDidBlurEditorText(() => {
+            editor.updateOptions({ renderLineHighlight: "none" });
+          });
+        }}
+        options={{
+          fontSize: 15,
+          minimap: { enabled: false },
+          automaticLayout: true,
+          scrollBeyondLastLine: false,
+        }}
+      />
+
+        <div
+  style={{
+    marginTop: "20px",
+    backgroundColor: "#1e1e1e",
+    color: "#d4d4d4",
+    padding: "15px",
+    borderRadius: "8px",
+    border: "1px solid #333",
+    height: "200px",
+    overflowY: "auto",
+    whiteSpace: "pre-wrap",
+    fontFamily: "'Fira Code', monospace"
+  }}
+>
+  <h3 style={{ margin: "0 0 10px 0", color: "#4caf50" }}>🖥 Output</h3>
+
+  {output && (
+    <div style={{ color: "#9cdcfe" }}>
+      {output}
+    </div>
+  )}
+
+  {outputError && (
+    <div style={{ color: "#ff6b6b" }}>
+      {outputError}
+    </div>
+  )}
+
+  {!output && !outputError && (
+    <div style={{ color: "#666" }}>Run code to see output here...</div>
+  )}
+</div>
+
+
         </div>
       </div>
     </div>
@@ -532,4 +628,4 @@ const Editor = () => {
   );
 };
 
-export default Editor;
+export default CollaborativeEditor;
